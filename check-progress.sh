@@ -51,8 +51,15 @@ check_once() {
   add 'MariaDB root password changed' "$pw" 'module password accepted'
 
   users=NO
-  if [ "$(getent shadow root | cut -d: -f2)" != '' ] && [ "$(getent shadow guest | cut -d: -f2)" != '' ] && [ "$(getent shadow anonymous | cut -d: -f2)" != '' ]; then
-    users=OK
+  baseline=/var/lib/os-hardening-native-lab/baseline-shadow
+  if [ -s "$baseline" ]; then
+    changed=0
+    for u in root guest anonymous; do
+      before=$(awk -F: -v user="$u" '$1==user{print $2}' "$baseline")
+      after=$(getent shadow "$u" 2>/dev/null | cut -d: -f2)
+      [ -n "$before" ] && [ -n "$after" ] && [ "$before" != "$after" ] && changed=$((changed+1))
+    done
+    [ "$changed" -eq 3 ] && users=OK
   fi
   add 'Training user passwords set' "$users" 'root, guest, anonymous have password hashes'
 

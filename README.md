@@ -56,3 +56,7 @@ sudo ./reset-lab.sh
 ```
 
 Password latihan di modul digunakan hanya untuk VM lab. Jangan memakai password tersebut pada sistem nyata.
+
+## Catatan versi checker
+
+Checker menyimpan hash password awal di `/var/lib/os-hardening-native-lab/baseline-shadow` sehingga kategori user hanya lulus jika password root, guest, dan anonymous benar-benar berubah. Kondisi bawaan seperti access log Nginx sekarang sengaja tidak memenuhi target. Setelah mengambil update, gunakan VM baru atau snapshot awal dan jalankan setup ulang agar baseline dibuat ulang.

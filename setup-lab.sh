@@ -18,6 +18,10 @@ for pair in 'ubuntu:UbuntuLab!2026' 'guest:GuestLab!2026' 'anonymous:AnonLab!202
 done
 usermod -aG sudo ubuntu || true
 
+# Save the intentionally vulnerable starting hashes so the progress checker can
+# tell whether the participant actually changed the training passwords.
+getent shadow root ubuntu guest anonymous > /var/lib/os-hardening-native-lab/baseline-shadow
+
 auto_backup() { cp -a "$1" "$1.lab-before" 2>/dev/null || true; }
 auto_backup /etc/ssh/sshd_config
 auto_backup /etc/vsftpd.conf
@@ -50,7 +54,6 @@ server {
     server_name _;
     root /var/www/html;
     index index.php index.html;
-    access_log /var/log/nginx/access.log;
     location / { try_files $uri $uri/ /index.php?$query_string; }
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
@@ -58,6 +61,10 @@ server {
     }
 }
 EOF
+
+# Deliberately disable the global access log in the starting state. The
+# participant must explicitly restore /var/log/nginx/access.log.
+sed -i -E 's@^\s*access_log\s+.*;\s*$@    access_log off;@' /etc/nginx/nginx.conf
 
 cat > /var/www/html/index.php <<'EOF'
 <?php
