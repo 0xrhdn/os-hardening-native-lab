@@ -11,7 +11,8 @@ apt-get install -y openssh-server vsftpd nginx php-fpm php-mysql mariadb-server 
 mkdir -p /var/lib/os-hardening-native-lab /opt/os-hardening-lab/backdoor
 
 # Training accounts. These are intentionally weak starting conditions for the disposable VM.
-for pair in 'ubuntu:UbuntuLab!2026' 'guest:GuestLab!2026' 'anonymous:AnonLab!2026'; do
+echo 'root:RootStart!2026' | chpasswd
+for pair in 'ubuntu:UbuntuLab!2026' 'guest:GuestStart!2026' 'anonymous:AnonStart!2026'; do
   user="${pair%%:*}"; pass="${pair#*:}"
   id "$user" >/dev/null 2>&1 || useradd -m -s /bin/bash "$user"
   echo "$user:$pass" | chpasswd
