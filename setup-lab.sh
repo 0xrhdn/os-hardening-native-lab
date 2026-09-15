@@ -65,6 +65,11 @@ EOF
 # Deliberately disable the global access log in the starting state. The
 # participant must explicitly restore /var/log/nginx/access.log.
 sed -i -E 's@^\s*access_log\s+.*;\s*$@    access_log off;@' /etc/nginx/nginx.conf
+# Deliberately expose the Nginx version in the starting state. Remove any
+# previous lab setting first so an old VM cannot make this check pass early.
+sed -i '/server_tokens[[:space:]]/d' /etc/nginx/nginx.conf
+sed -i '/^[[:space:]]*http[[:space:]]*{/a\    server_tokens on;' /etc/nginx/nginx.conf
+printf 'on\n' > /var/lib/os-hardening-native-lab/baseline-nginx-server-tokens
 
 cat > /var/www/html/index.php <<'EOF'
 <?php

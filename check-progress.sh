@@ -19,7 +19,7 @@ check_once() {
   ftp_ok=NO; grep -Eq '^\s*anonymous_enable\s*=\s*NO\s*$' /etc/vsftpd.conf 2>/dev/null && ftp_ok=OK
   add 'FTP anonymous disabled' "$ftp_ok" 'vsftpd anonymous_enable=NO'
 
-  nginxv=NO; command -v nginx >/dev/null 2>&1 && nginx -T 2>/dev/null | grep -Eq '^\s*server_tokens\s+off\s*;' && nginxv=OK
+  nginxv=NO; command -v nginx >/dev/null 2>&1 && [ "$(cat /var/lib/os-hardening-native-lab/baseline-nginx-server-tokens 2>/dev/null)" = on ] && nginx -T 2>/dev/null | grep -Eq '^\s*server_tokens\s+off\s*;' && nginxv=OK
   add 'Nginx version hidden' "$nginxv" 'server_tokens off'
 
   access=NO; nginx -T 2>/dev/null | grep -Eq 'access_log\s+/var/log/nginx/access\.log' && access=OK
